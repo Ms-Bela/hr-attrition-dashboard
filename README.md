@@ -16,9 +16,83 @@ Employee turnover increases recruitment cost, disrupts projects, and erodes inst
 
 ---
 
-## 📦 Repository Structure
+📌 Project Overview
+The HR Attrition Analytics Dashboard is an interactive business intelligence tool designed to analyze employee turnover trends and patterns.
+It provides HR leaders with insights into who is leaving, from where, and why, helping them implement targeted retention strategies.
 
-```
+Built with:
+
+BigQuery (for data preparation & SQL analysis)
+
+Tableau (for visualization & interactivity)
+
+IBM HR Analytics dataset (cleaned & structured)
+--
+
+Linking attrition trends to satisfaction and engagement metrics.
+---
+✅ Solution
+A data-driven dashboard that:
+
+Monitors attrition KPIs: Attrition rate, total employees, total exits.
+
+Highlights hotspots: By department, job role, gender, age band, and tenure.
+
+Reveals trends: Attrition over time, income vs tenure patterns.
+
+Supports drill-down: Interactive filters for exploring specific segments.
+---
+📊 Key Visualizations
+KPI Cards
+Attrition Rate — % of employees leaving.
+
+Total Employees — Current workforce size.
+
+Attrition Count — Total number of leavers.
+
+Attrition by Department
+Bar chart comparing departments — reveals R&D and Sales have the highest attrition.
+
+Attrition by Gender × Department
+Stacked bar chart showing gender-specific attrition patterns within each department.
+
+Attrition by Tenure Band
+Highlights early-tenure vulnerability (0–1 and 2–5 years).
+
+Department Attrition per Age Group
+Donut charts showing department-level attrition across five age groups.
+
+Job Level Distribution
+Histogram illustrating headcount distribution by job level.
+
+Monthly Income vs Years at Company
+Scatter plot identifying compensation and tenure outliers among leavers.
+---
+🧹 Data Preparation
+Steps in BigQuery
+Load cleaned dataset (hr_attrition_cleaned.csv) into:
+i-breaker-415709.hr_analytics.hr_employees
+
+Data cleaning:
+
+Standardize column names.
+
+Remove irrelevant fields (employee_count, standard_hours).
+
+Create calculated fields:
+
+attrition_flag (Yes=1, No=0)
+
+tenure_band (bucketed years at company)
+
+Feature engineering:
+
+Synthetic attrition_month for month-level trend analysis (replace with real attrition dates if available).
+
+📂 Repository Structure
+pgsql
+Copy
+Edit
 hr-attrition-dashboard/
 ├─ data/
 │  └─ hr_attrition_cleaned.csv
@@ -36,111 +110,59 @@ hr-attrition-dashboard/
 │  ├─ 6_eda.sql
 │  └─ 7_attrition_by_month.sql
 └─ README.md
-```
+---
+🧭 Interactivity & Filters
+Dashboard includes:
 
-> **BigQuery Namespace:** `i-breaker-415709.hr_analytics` (table: `hr_employees`)  
-> Update to match your own project if different.
+Department
+
+Job Role
+
+Gender
+
+Age Band
+
+Tenure Band
+
+Education Field
+
+Attrition Status
+
+Attrition Month
+
+Filters are applied to all worksheets for a unified interactive experience.
 
 ---
 
-## 🧹 Data Cleaning & Feature Engineering
+💡 Insights
+R&D and Sales lead in attrition counts.
 
-- Standardized column names and dropped non-analytic fields (employee_count, standard_hours, etc.).
-- Created `attrition_flag` (Yes=1, No=0) and `tenure_band` buckets.
-- Ensured categorical fields are strings (department, job_role, gender, cf_age_band, tenure_band, education_field).
-- For monthly analysis, generated a **deterministic synthetic month** for leavers using employee fingerprinting (see `5_casts_and_features.sql`). Replace with real `attrition_date` if available.
+Early-tenure employees are at highest risk.
 
----
+Low satisfaction scores correlate with higher exits.
 
-## 🔍 SQL (BigQuery) — How to Reproduce
+📌 Recommendations
+Onboarding & Mentorship — Focus retention efforts on employees in their first 1–2 years.
 
-1. **Create Dataset**
-   ```sql
-   -- sql/1_create_dataset.sql
-   CREATE SCHEMA IF NOT EXISTS `i-breaker-415709.hr_analytics`;
-   ```
+Targeted Interventions — Address job satisfaction in high-turnover departments.
 
-2. **Load Table**
-   - Upload `data/hr_attrition_cleaned.csv` to Cloud Storage, then load into `i-breaker-415709.hr_analytics.hr_employees` via the BigQuery UI  
-     *(or adapt `2_load_table_from_gcs.sql` to your environment).*
+Compensation Review — Investigate pay disparities affecting retention.
 
-3. **Quality Checks & Features**
-   - Run `3_schema_checks.sql` and `4_nulls_and_quality.sql` for sanity checks.
-   - Run `5_casts_and_features.sql` to create `hr_employees_curated` with features like `attrition_month_num`.
+Ongoing Monitoring — Refresh dashboard monthly and set alerts for attrition spikes.
 
-4. **Exploratory Queries**
-   - Use `6_eda.sql` for department/gender/tenure summaries.
-   - Use `7_attrition_by_month.sql` for the month view driving the histogram/bar chart in Tableau.
+🚀 How to Use
+Clone this repository.
 
-> **Fully Qualified Names Used:** ``i-breaker-415709.hr_analytics.hr_employees`` and `i-breaker-415709.hr_analytics.hr_employees_curated`
+Load hr_attrition_cleaned.csv into BigQuery.
 
----
+Run scripts in /sql to prepare tables.
 
-## 📊 Dashboard Contents (Tableau)
+Open the Tableau dashboard using the provided public link or recreate it locally.
 
-### 1) KPIs
-- **Total Employees** (COUNTD employee_number)
-- **Attrition Count** (SUM attrition_flag)
-- **Attrition Rate** (SUM(attrition_flag)/COUNT(employee_number))
+----
 
-### 2) Attrition by Department (Bar)
-Highlights volume of exits across R&D, Sales, and HR. R&D shows the highest attrition count in this dataset snapshot.
-
-### 3) Attrition by Gender × Department (Stacked Bar)
-Reveals department–gender interaction. Useful to spot skew (e.g., male-dominant exits in specific roles).
-
-### 4) Department Attrition per Age Group (Donut Small Multiples)
-Five age bands (Under 25, 25–34, 35–44, 45–54, Over 55). Sales tends to dominate in younger bands; HR share increases with age group in the sample.
-
-### 5) Job Level Distribution (Histogram)
-Checks headcount distribution across job levels; skewed lower levels can artificially inflate attrition count in those bands.
-
-### 6) Monthly Income vs Years at Company (Scatter)
-Identifies potential compensation-tenure outliers among leavers (mark color = Attrition).
-
-### 7) Attrition by Tenure Band (Bar)
-Shows early-tenure vulnerability (0–1, 2–5 years) typical of onboarding/fit concerns.
-
-> Images for quick preview are in `/images/`:
-- `images/Dashboard 3.png`
-- `images/Age Band Distribution.png`
-- `images/Attrition by Gender.png`
-- `images/Attrition by Department.png`
-
----
-
-## 🧭 Interactivity (Filters)
-
-Recommended dashboard filters:
-- `Department`, `Job Role`, `Gender`
-- `CF Age Band` (age groups), `Tenure Band`
-- `Education Field`
-- `Attrition` (Yes/No)
-- `Attrition Month` (synthetic or real)
-
-Apply filters to **“All Using This Data Source”** for a cohesive experience.
-
----
-
-## 💡 Insights & Recommendations
-
-**Findings (from the sample):**
-- **R&D** and **Sales** show higher attrition volumes.
-- **Early tenure** (0–1 and 2–5 years) accounts for a majority of exits.
-- **Satisfaction signals** (work-life, relationship, environment) correlate with exits; low scores align with higher attrition clusters in scatter plots.
-
-**Recommendations:**
-1. **Strengthen onboarding & mentorship** in first 12 months; track cohort-level retention KPIs.
-2. **Manager enablement**: target teams with low satisfaction scores; deploy pulse surveys + action plans.
-3. **Role-specific retention levers**: for Sales (variable pay, territory fairness), for R&D (career path visibility, learning budgets).
-4. **Compensation review**: boxplot income by role/tenure to flag inequities.
-5. **Operationalize monitoring**: refresh dashboard monthly; add alerts when attrition rate exceeds threshold by department.
-
-**Next Enhancements:**
-- Replace synthetic month with **true attrition dates**.
-- Add **survival analysis** (Kaplan–Meier) and **drivers modeling** (logistic regression or SHAP on tree models).
-- Integrate **recruiting funnel** to connect exits with backfills and time-to-fill.
-
+📝 License
+MIT License — Free for educational and portfolio use.
 ---
 
 ## 🚀 How to Use This Package
@@ -153,5 +175,3 @@ Apply filters to **“All Using This Data Source”** for a cohesive experience.
 
 ---
 
-## 📝 License
-MIT — free for educational and portfolio use. Replace or remove if needed.
