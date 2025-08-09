@@ -88,28 +88,6 @@ tenure_band (bucketed years at company)
 Feature engineering:
 
 Synthetic attrition_month for month-level trend analysis (replace with real attrition dates if available).
-
-📂 Repository Structure
-pgsql
-Copy
-Edit
-hr-attrition-dashboard/
-├─ data/
-│  └─ hr_attrition_cleaned.csv
-├─ images/
-│  ├─ Dashboard 3.png
-│  ├─ Age Band Distribution.png
-│  ├─ Attrition by Gender.png
-│  └─ Attrition by Department.png
-├─ sql/
-│  ├─ 1_create_dataset.sql
-│  ├─ 2_load_table_from_gcs.sql
-│  ├─ 3_schema_checks.sql
-│  ├─ 4_nulls_and_quality.sql
-│  ├─ 5_casts_and_features.sql
-│  ├─ 6_eda.sql
-│  └─ 7_attrition_by_month.sql
-└─ README.md
 ---
 🧭 Interactivity & Filters
 Dashboard includes:
@@ -149,6 +127,7 @@ Targeted Interventions — Address job satisfaction in high-turnover departments
 Compensation Review — Investigate pay disparities affecting retention.
 
 Ongoing Monitoring — Refresh dashboard monthly and set alerts for attrition spikes.
+---
 
 🚀 How to Use
 Clone this repository.
